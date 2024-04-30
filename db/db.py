@@ -2,7 +2,7 @@ from sqlmodel import SQLModel, create_engine, Session, select
 from sqlalchemy.exc import OperationalError
 from db.models import ChatType, Chat, User, Message, Update
 from sqlalchemy.orm import sessionmaker
-
+import pprint
 
 # Creating the engine
 ENGINE_URL = 'sqlite:///updates.db'
@@ -37,17 +37,20 @@ def add_update_to_database(update_data, engine):
     
     with Session(engine) as session:
         # Deconstruct the nested update_data structure
-        chat_type_data = update_data['message']['chat']['type']
-        chat_type = ChatType(**{"type_name": chat_type_data.value})
-
         chat_data = update_data['message']['chat']
-        chat = Chat(**chat_data, type=chat_type)
+        chat_type_data = chat_data['type']
+        chat_type = ChatType(type_name=chat_type_data.value)
+        chat_data['type'] = chat_type
+        chat = Chat(chat_id=chat_data.pop('id'), **chat_data)
 
+        pprint.pprint(update_data)
         user_data = update_data['message']['from']
-        user = User(**user_data)
+        user = User(user_id=user_data.pop('id'), **user_data)
 
         message_data = update_data['message']
-        message = Message(**message_data, chat=chat, from_user=user)
+        message_data['chat'] = chat
+        message_data['from_user'] = user
+        message = Message(**message_data)
 
         # Check if reply_to_message exists
         if 'reply_to_message' in message_data:
@@ -64,6 +67,8 @@ def add_update_to_database(update_data, engine):
             reply_message = Message(**reply_message_data, chat=reply_chat, from_user=reply_user)
             message.reply_to_message = reply_message
             session.add(reply_message)
+
+        pprint.pprint(message)
 
         session.add(message)
 

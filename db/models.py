@@ -3,17 +3,19 @@ from sqlmodel import SQLModel, Field, Relationship
 
 class ChatType(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    type_name: str = Field(sa_column_kwargs={"unique": True})
+    type_name: str = Field(sa_column_kwargs={"unique": False})
 
 class Chat(SQLModel, table=True):
     id: int = Field(primary_key=True)
+    chat_id: Optional[int] = Field(default=None)
     all_members_are_administrators: bool = Field()
     title: str = Field()
     type_id: int = Field(foreign_key="chattype.id")
     type: ChatType = Relationship()
 
 class User(SQLModel, table=True):
-    id: int = Field(primary_key=True)
+    id: int = Field(primary_key=True, index=True)
+    user_id: Optional[int] = Field(default=None)  # Telegram user ID
     first_name: str = Field()
     last_name: Optional[str] = Field(default=None)
     is_bot: bool = Field()
