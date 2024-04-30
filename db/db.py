@@ -54,19 +54,21 @@ def add_update_to_database(update_data, engine):
 
         # Check if reply_to_message exists
         if 'reply_to_message' in message_data:
-            reply_chat_type_data = message_data['reply_to_message']['chat']['type']
-            reply_chat_type = ChatType(**reply_chat_type_data)
-
             reply_chat_data = message_data['reply_to_message']['chat']
-            reply_chat = Chat(**reply_chat_data, type=reply_chat_type)
+            reply_chat_data_type = reply_chat_data['type']
+            reply_chat_type = ChatType(type_name=reply_chat_data_type.value)
+            reply_chat_data['type'] = reply_chat_type
+            reply_chat = Chat(chat_id = reply_chat_data.pop('id'), **reply_chat_data)
 
             reply_user_data = message_data['reply_to_message']['from']
-            reply_user = User(**reply_user_data)
+            reply_user = User(user_id = reply_user_data.pop('id'), **reply_user_data)
 
             reply_message_data = message_data['reply_to_message']
-            reply_message = Message(**reply_message_data, chat=reply_chat, from_user=reply_user)
+            reply_message_data['chat'] = reply_chat
+            reply_message_data['from_user'] = reply_user
+            reply_message = Message(**reply_message_data)
             message.reply_to_message = reply_message
-            session.add(reply_message)
+            # session.add(reply_message)
 
         pprint.pprint(message)
 
