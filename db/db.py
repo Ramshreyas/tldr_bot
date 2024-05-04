@@ -50,7 +50,7 @@ def add_update_to_database(update_data, engine):
         message_data = update_data['message']
         message_data['chat'] = chat
         message_data['from_user'] = user
-        message = Message(**message_data)
+        message = Message(message_id = message_data.pop('message_id'), **message_data)
 
         # Check if reply_to_message exists
         if 'reply_to_message' in message_data:
@@ -66,7 +66,7 @@ def add_update_to_database(update_data, engine):
             reply_message_data = message_data['reply_to_message']
             reply_message_data['chat'] = reply_chat
             reply_message_data['from_user'] = reply_user
-            reply_message = Message(**reply_message_data)
+            reply_message = Message(message_id = reply_message_data.pop('message_id'), **reply_message_data)
             message.reply_to_message = reply_message
             # session.add(reply_message)
 

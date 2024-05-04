@@ -23,7 +23,8 @@ class User(SQLModel, table=True):
     username: Optional[str] = Field()
 
 class Message(SQLModel, table=True):
-    message_id: int = Field(primary_key=True)
+    id: int = Field(primary_key=True)
+    message_id: int = Field(default=None)
     channel_chat_created: bool = Field()
     chat_id: int = Field(foreign_key="chat.id")
     chat: Chat = Relationship()
