@@ -5,6 +5,10 @@ import pprint
 import dotenv
 dotenv.load_dotenv()
 
+# Add /app to the start of the sys.path list
+import sys
+sys.path.insert(0, '/app')
+
 
 # Telegram
 from telegram import Update

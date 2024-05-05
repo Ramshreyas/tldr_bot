@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  bot:
+    build: .
+    container_name: tldr_bot
+    depends_on:
+      - db
+    environment:
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=updatesdb
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=your_password
+    restart: always
+
+  db:
+    image: postgres:13
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: updatesdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+volumes:
+  postgres_data:

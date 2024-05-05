@@ -1,5 +1,6 @@
 from typing import Optional
 from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import Column, BigInteger
 
 class ChatType(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -7,7 +8,7 @@ class ChatType(SQLModel, table=True):
 
 class Chat(SQLModel, table=True):
     id: int = Field(primary_key=True)
-    chat_id: Optional[int] = Field(default=None)
+    chat_id: Optional[int] = Field(default=None, sa_column=Column(BigInteger()))
     all_members_are_administrators: bool = Field()
     title: str = Field()
     type_id: int = Field(foreign_key="chattype.id")
@@ -33,12 +34,12 @@ class Message(SQLModel, table=True):
     from_user_id: int = Field(foreign_key="user.id")
     from_user: User = Relationship()
     group_chat_created: bool = Field()
-    reply_to_message_id: Optional[int] = Field(default=None, foreign_key="message.message_id")
-    reply_to_message: 'Message' = Relationship(sa_relationship_kwargs={"remote_side": "Message.message_id"})
+    reply_to_message_id: Optional[int] = Field(default=None, foreign_key="message.id")
+    reply_to_message: 'Message' = Relationship(sa_relationship_kwargs={"remote_side": "Message.id"})
     supergroup_chat_created: bool = Field()
     text: Optional[str] = Field()
 
 class Update(SQLModel, table=True):
     update_id: int = Field(primary_key=True)
-    message_id: Optional[int] = Field(default=None, foreign_key="message.message_id")
+    message_id: Optional[int] = Field(default=None, foreign_key="message.id")
     message: Optional[Message] = Relationship()

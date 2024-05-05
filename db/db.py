@@ -4,8 +4,15 @@ from db.models import ChatType, Chat, User, Message, Update
 from sqlalchemy.orm import sessionmaker
 import pprint
 
-# Creating the engine
-ENGINE_URL = 'sqlite:///updates.db'
+# PostgreSQL connection URL
+DATABASE_HOST = "db"  # Service name in docker-compose.yml
+DATABASE_PORT = "5432"
+DATABASE_NAME = "updatesdb"
+DATABASE_USER = "postgres"
+DATABASE_PASSWORD = "your_password"
+
+ENGINE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
+
 engine = create_engine(ENGINE_URL, echo=True, pool_pre_ping=True)
 
 
@@ -18,7 +25,7 @@ def ensure_database_schema(engine=engine):
         # Attempt to fetch data from an expected table to see if schema is in place
         with Session(engine) as session:
             session.execute(select(User)).first()
-    except OperationalError:
+    except:
         # If schema doesn't exist, create it
         SQLModel.metadata.create_all(engine)
 
@@ -37,13 +44,13 @@ def add_update_to_database(update_data, engine):
     
     with Session(engine) as session:
         # Deconstruct the nested update_data structure
+        pprint.pprint(update_data)
         chat_data = update_data['message']['chat']
         chat_type_data = chat_data['type']
         chat_type = ChatType(type_name=chat_type_data.value)
         chat_data['type'] = chat_type
         chat = Chat(chat_id=chat_data.pop('id'), **chat_data)
 
-        pprint.pprint(update_data)
         user_data = update_data['message']['from']
         user = User(user_id=user_data.pop('id'), **user_data)
 
