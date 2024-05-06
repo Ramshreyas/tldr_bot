@@ -1,0 +1,18 @@
+# Use an official Python runtime as a parent image
+FROM jupyter/base-notebook
+
+# Install PostgreSQL adapter for Python
+USER root
+RUN pip install sqlalchemy psycopg2-binary sqlmodel
+
+# Switch back to jupyter user
+USER jovyan
+
+# Set the working directory to /notebooks
+WORKDIR /notebooks
+
+# Make port 8888 available to the world outside this container
+EXPOSE 8888
+
+# Run Jupyter notebook
+CMD ["start-notebook.sh", "--NotebookApp.token=''", "--NotebookApp.password=''"]
