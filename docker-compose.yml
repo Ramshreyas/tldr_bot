@@ -12,6 +12,11 @@ services:
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=your_password
     restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   jupyter:
     build:

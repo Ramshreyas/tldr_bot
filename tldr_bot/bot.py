@@ -35,19 +35,20 @@ if __name__ == '__main__':
     application = ApplicationBuilder().token(Config.TELEGRAM_TOKEN).build()
     
     # Register handlers
-    archive_handler = MessageHandler(filters.ChatType.GROUP, archive)
-    chat_handler = MessageHandler(filters.TEXT & (~filters.COMMAND) & (~filters.ChatType.GROUP), chat)
-    help_handler = CommandHandler('help', help)
-    start_handler = CommandHandler('start', help)
-    tldr_handler = CommandHandler('tldr', tldr)
-    unknown_handler = MessageHandler(filters.COMMAND, unknown)
+    archive_handler = MessageHandler(filters.TEXT, archive)
+    # archive_handler = MessageHandler(filters.ChatType.GROUP, archive)
+    # chat_handler = MessageHandler(filters.TEXT & (~filters.COMMAND) & (~filters.ChatType.GROUP), chat)
+    # help_handler = CommandHandler('help', help)
+    # start_handler = CommandHandler('start', help)
+    # tldr_handler = CommandHandler('tldr', tldr)
+    # unknown_handler = MessageHandler(filters.COMMAND, unknown)
 
     # Add handlers to the application
     application.add_handler(archive_handler)
-    application.add_handler(chat_handler)
-    application.add_handler(help_handler)
-    application.add_handler(start_handler)
-    application.add_handler(tldr_handler)
-    application.add_handler(unknown_handler)
+    # application.add_handler(chat_handler)
+    # application.add_handler(help_handler)
+    # application.add_handler(start_handler)
+    # application.add_handler(tldr_handler)
+    # application.add_handler(unknown_handler)
     
     application.run_polling()

@@ -1,8 +1,12 @@
+# Packages
 from sqlmodel import SQLModel, create_engine, Session, select
 from sqlalchemy.exc import OperationalError
-from db.models import ChatType, Chat, User, Message, Update
 from sqlalchemy.orm import sessionmaker
 import pprint
+from datetime import datetime
+
+# TLDR Bot modules
+from db.models import ChatType, Chat, User, Message, Update
 
 # PostgreSQL connection URL
 DATABASE_HOST = "db"  # Service name in docker-compose.yml
@@ -84,3 +88,27 @@ def add_update_to_database(update_data, engine):
         update = Update(update_id=update_data['update_id'], message=message)
         session.add(update)
         session.commit()
+
+def reconstruct_chat_as_text(engine, start_time: datetime, end_time: datetime):
+    chat_history = []
+    with Session(engine) as session:
+        # Define the query with a time filter and order by date
+        statement = select(Message, User).join(User).where(
+            (Message.date >= start_time.timestamp()) & 
+            (Message.date <= end_time.timestamp())
+        ).order_by(Message.date)
+
+        results = session.exec(statement).all()
+
+        for message, user in results:
+            if message.reply_to_message_id:
+                # Fetch the original message and user if the current message is a reply
+                original_message = session.get(Message, message.reply_to_message_id)
+                original_user = session.get(User, original_message.from_user_id)
+                chat_line = f"{user.username}: <replying to: {original_user.username}: {original_message.text}> {message.text}"
+            else:
+                chat_line = f"{user.username}: {message.text}"
+            
+            chat_history.append(chat_line)
+
+    return "\n".join(chat_history)
