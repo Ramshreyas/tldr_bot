@@ -48,17 +48,19 @@ def add_update_to_database(update_data, engine):
     
     with Session(engine) as session:
         # Deconstruct the nested update_data structure
+        # Chat data
         pprint.pprint(update_data)
-        chat_data = update_data['message']['chat']
+        chat_data = update_data.get('message', update_data.get('edited_message', {})).get('chat', {})
         chat_type_data = chat_data['type']
         chat_type = ChatType(type_name=chat_type_data.value)
         chat_data['type'] = chat_type
         chat = Chat(chat_id=chat_data.pop('id'), **chat_data)
 
-        user_data = update_data['message']['from']
+        # User data
+        user_data = update_data.get('message', update_data.get('edited_message', {})).get('from', {})
         user = User(user_id=user_data.pop('id'), **user_data)
 
-        message_data = update_data['message']
+        message_data = update_data.get('message', update_data.get('edited_message', {}))
         message_data['chat'] = chat
         message_data['from_user'] = user
         message = Message(message_id = message_data.pop('message_id'), **message_data)
