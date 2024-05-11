@@ -18,17 +18,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  jupyter:
-    build:
-      context: .
-      dockerfile: JupyterDockerfile
-    ports:
-      - "8888:8888"
-    volumes:
-      - ./notebooks:/notebooks
-    depends_on:
-      - db
-
   db:
     image: postgres:13
     container_name: postgres_db
