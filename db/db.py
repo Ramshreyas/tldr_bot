@@ -91,6 +91,11 @@ def add_update_to_database(update_data, engine):
         session.add(update)
         session.commit()
 
+
+def get_tldr(engine, date: datetime):
+    return None
+
+
 def reconstruct_chat_as_text(engine, start_time: datetime, end_time: datetime):
     chat_history = []
     with Session(engine) as session:
