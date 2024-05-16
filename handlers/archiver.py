@@ -9,6 +9,7 @@ from telegram.ext import ContextTypes, ContextTypes
 
 
 # TLDR Bot
+from config.config import Config
 from db.db import get_db, add_update_to_database, ensure_database_schema
 
 

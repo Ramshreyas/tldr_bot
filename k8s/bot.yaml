@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot-deployment
+spec:
+  selector:
+    matchLabels:
+      app: tldr-bot
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tldr-bot
+    spec:
+      containers:
+        - name: tldr-bot
+          image: tldr_bot:latest  # Use the local Docker image
+          imagePullPolicy: Never
+          env:
+            - name: DATABASE_HOST
+              value: "db"  # Use the 'db' hostname for the PostgreSQL service
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: DATABASE_NAME
+              value: "updatesdb"
+            - name: DATABASE_USER
+              value: "postgres"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+          ports:
+            - containerPort: 8000  # Adjust the port as per your bot configuration
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bot-service
+spec:
+  selector:
+    app: tldr-bot
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000  # Adjust the port as per your bot configuration
+  type: ClusterIP

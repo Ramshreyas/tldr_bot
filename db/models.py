@@ -16,7 +16,7 @@ class Chat(SQLModel, table=True):
 
 class User(SQLModel, table=True):
     id: int = Field(primary_key=True, index=True)
-    user_id: Optional[int] = Field(default=None)  # Telegram user ID
+    user_id: Optional[int] = Field(default=None, sa_column=Column(BigInteger()))  # Telegram user ID
     first_name: str = Field()
     last_name: Optional[str] = Field(default=None)
     is_bot: bool = Field()

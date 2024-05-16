@@ -13,7 +13,7 @@ from sqlmodel import Session, select
 
 # Instantiate OpenAI chat client
 from openai import OpenAI
-gpt = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+gpt = OpenAI(api_key=Config.OPENAI_API_KEY)
 
 
 # Select the conversation for a message

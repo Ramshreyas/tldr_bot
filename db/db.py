@@ -1,11 +1,16 @@
-# Packages
+# General
+import os
+import pprint
+from datetime import datetime
+import logging
+
+# SQLAlchemy
 from sqlmodel import SQLModel, create_engine, Session, select
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
-import pprint
-from datetime import datetime
 
 # TLDR Bot modules
+from config.config import Config
 from db.models import ChatType, Chat, User, Message, Update
 
 # PostgreSQL connection URL
@@ -13,7 +18,7 @@ DATABASE_HOST = "db"  # Service name in docker-compose.yml
 DATABASE_PORT = "5432"
 DATABASE_NAME = "updatesdb"
 DATABASE_USER = "postgres"
-DATABASE_PASSWORD = "your_password"
+DATABASE_PASSWORD = Config.DATABASE_PASSWORD
 
 ENGINE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 
@@ -28,6 +33,7 @@ def ensure_database_schema(engine=engine):
     try:
         # Attempt to fetch data from an expected table to see if schema is in place
         with Session(engine) as session:
+            logging.info(f"DB URL: {ENGINE_URL}")
             session.execute(select(User)).first()
     except:
         # If schema doesn't exist, create it
