@@ -8,7 +8,8 @@ from config.config import Config
 from db.models import Message
 from db.db import get_db, get_tldr
 
-# SQLAlchemy
+# SQLAlchemy & SQLModel
+from sqlalchemy.orm import joinedload
 from sqlmodel import Session, select
 
 # Instantiate OpenAI chat client
@@ -111,7 +112,11 @@ def create_transcripts_from_conversations(conversations: List[List[Message]], en
             if message.reply_to_message_id:
                 # Fetch the message being replied to
                 with Session(engine) as session:
-                    statement = select(Message).where(Message.id == message.reply_to_message_id)
+                    statement = (
+                        select(Message)
+                        .where(Message.id == message.reply_to_message_id)
+                        .options(joinedload(Message.from_user))
+                    )
                     result = session.exec(statement).first()
                     transcript += f"{message.from_user.username} (replying to {result.from_user.username}): {message.text}\n"
             else:
