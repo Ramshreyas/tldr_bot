@@ -36,7 +36,6 @@ if __name__ == '__main__':
     
     # Register handlers
     archive_handler = MessageHandler(filters.TEXT, archive)
-    # archive_handler = MessageHandler(filters.ChatType.GROUP, archive)
     # chat_handler = MessageHandler(filters.TEXT & (~filters.COMMAND) & (~filters.ChatType.GROUP), chat)
     # help_handler = CommandHandler('help', help)
     # start_handler = CommandHandler('start', help)

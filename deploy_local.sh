@@ -14,8 +14,8 @@ IMAGE_TAG="${IMAGE_NAME}:${COMMIT_HASH}"
 docker build -t ${IMAGE_TAG} -f Dockerfile .
 
 # Load the image into Docker Desktop Kubernetes
-docker save ${IMAGE_TAG} -o ${IMAGE_NAME}_${COMMIT_HASH}.tar
-docker load -i ${IMAGE_NAME}_${COMMIT_HASH}.tar
+# docker save ${IMAGE_TAG} -o ${IMAGE_NAME}_${COMMIT_HASH}.tar
+# docker load -i ${IMAGE_NAME}_${COMMIT_HASH}.tar
 
 # Update the bot.yaml file with the new image tag
 sed -i.bak "s|tldr_bot:.*|${IMAGE_TAG}|g" k8s/bot.yaml
