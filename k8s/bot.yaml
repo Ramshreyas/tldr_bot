@@ -30,6 +30,26 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+            - name: TELEGRAM_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: telegram
+                  key: TELEGRAM_BOT_TOKEN
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: telegram
+                  key: OPENAI_API_KEY
+            - name: TELEGRAM_CORE_API_ID
+              valueFrom:
+                secretKeyRef:
+                  name: telegram
+                  key: TELEGRAM_CORE_API_ID
+            - name: TELEGRAM_CORE_API_HASH
+              valueFrom:
+                secretKeyRef:
+                  name: telegram
+                  key: TELEGRAM_CORE_API_HASH
           ports:
             - containerPort: 8000  # Adjust the port as per your bot configuration
 ---

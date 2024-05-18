@@ -1,20 +1,14 @@
 # OS, utilities, logging, dotenv
-import os
 import logging
-import pprint
-import dotenv
-dotenv.load_dotenv()
 
 # Add /app to the start of the sys.path list
 import sys
 sys.path.insert(0, '/app')
 
-
 # Telegram
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
-
 
 # TLDR Bot
 from config.config import Config
