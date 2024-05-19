@@ -29,11 +29,11 @@ if __name__ == '__main__':
     application = ApplicationBuilder().token(Config.TELEGRAM_TOKEN).build()
     
     # Register handlers
-    archive_handler = MessageHandler(filters.TEXT, archive)
+    tldr_handler = CommandHandler('tldr', tldr)
+    archive_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), archive)
     # chat_handler = MessageHandler(filters.TEXT & (~filters.COMMAND) & (~filters.ChatType.GROUP), chat)
     # help_handler = CommandHandler('help', help)
     # start_handler = CommandHandler('start', help)
-    tldr_handler = CommandHandler('tldr', tldr)
     # unknown_handler = MessageHandler(filters.COMMAND, unknown)
 
     # Add handlers to the application
