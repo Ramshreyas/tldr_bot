@@ -38,7 +38,8 @@ jobs:
       env:
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        sed -i.bak "s|tldr_bot:.*|${IMAGE_TAG}|g" k8s/bot.yaml  # Update the image tag in the deployment file
+        sed -i.bak "s|tldr_bot:.*|registry.digitalocean.com/ethfoundation/tldr_bot:${IMAGE_TAG}|g" k8s/bot.yaml  # Update the image tag in the deployment file
+        cat k8s/bot.yaml
         kubectl apply -f k8s/postgres-pv.yaml
         kubectl apply -f k8s/postgres.yaml
         kubectl apply -f k8s/bot.yaml
