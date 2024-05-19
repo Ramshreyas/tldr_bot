@@ -31,13 +31,8 @@ jobs:
         IMAGE_TAG: ${{ github.sha }}
       run: docker push registry.digitalocean.com/ethfoundation/tldr_bot:$IMAGE_TAG
 
-    - name: Update deployment file
-      env:
-        IMAGE_TAG: ${{ github.sha }}
-      run: sed -i 's|<IMAGE>|registry.digitalocean.com/ethfoundation/tldr_bot:$IMAGE_TAG|' $GITHUB_WORKSPACE/config/deployment.yml
-
     - name: Save DigitalOcean kubeconfig with short-lived credentials
-      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 <cluster-name>
+      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ethfoundation
 
     - name: Deploy to DigitalOcean Kubernetes
       env:
