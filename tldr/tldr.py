@@ -105,23 +105,24 @@ def reconstruct_chat_as_conversations(engine, start_time: datetime, end_time: da
 # Create transcripts from conversations
 def create_transcripts_from_conversations(conversations: List[List[Message]], engine) -> str:
     transcripts = []
-    for conversation in conversations:
-        transcript = ""
-        for message in conversation:
-            # Check if the message is a reply
-            if message.reply_to_message_id:
-                # Fetch the message being replied to
-                with Session(engine) as session:
-                    statement = (
-                        select(Message)
-                        .where(Message.id == message.reply_to_message_id)
-                        .options(joinedload(Message.from_user))
-                    )
-                    result = session.exec(statement).first()
+    
+    # Create a single session to handle all operations
+    with Session(engine) as session:
+        for conversation in conversations:
+            transcript = ""
+            for message in conversation:
+                # Eager load the from_user relationship
+                message = session.query(Message).options(joinedload(Message.from_user)).filter(Message.id == message.id).first()
+                
+                # Check if the message is a reply
+                if message.reply_to_message_id:
+                    # Fetch the message being replied to
+                    result = session.query(Message).options(joinedload(Message.from_user)).filter(Message.id == message.reply_to_message_id).first()
                     transcript += f"{message.from_user.username} (replying to {result.from_user.username}): {message.text}\n"
-            else:
-                transcript += f"{message.from_user.username}: {message.text}\n"
-        transcripts.append(transcript)
+                else:
+                    transcript += f"{message.from_user.username}: {message.text}\n"
+            transcripts.append(transcript)
+    
     return transcripts
 
 
