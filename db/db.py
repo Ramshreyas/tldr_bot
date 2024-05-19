@@ -87,7 +87,7 @@ def add_update_to_database(update_data, engine):
             reply_message_data['from_user'] = reply_user
             reply_message = Message(message_id = reply_message_data.pop('message_id'), **reply_message_data)
             message.reply_to_message = reply_message
-            session.add(reply_message)
+            # session.add(reply_message)
 
         pprint.pprint(message)
 
