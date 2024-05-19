@@ -15,7 +15,7 @@ spec:
       containers:
         - name: tldr-bot
           image: tldr_bot:latest  # Use the local Docker image
-          imagePullPolicy: Never
+          imagePullPolicy: Always
           env:
             - name: DATABASE_HOST
               value: "db"  # Use the 'db' hostname for the PostgreSQL service

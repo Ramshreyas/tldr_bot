@@ -10,3 +10,4 @@ notebooks/.ipynb_checkpoints/Scratch-checkpoint.ipynb
 
 # Local docker image to load into k8s
 tldr_bot_49eedb9.tar
+k8s/bot-local.yaml
