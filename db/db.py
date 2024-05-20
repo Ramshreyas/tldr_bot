@@ -6,9 +6,9 @@ import logging
 from typing import Optional
 
 # SQLAlchemy
-from sqlmodel import SQLModel, create_engine, Session, select, selectinload
+from sqlmodel import SQLModel, create_engine, Session, select
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, selectinload
 
 # TLDR Bot modules
 from config.config import Config
