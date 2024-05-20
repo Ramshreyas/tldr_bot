@@ -55,13 +55,13 @@ class Data(SQLModel, table=True):
     title: str
     summary: str
     transcript: str
-    tldr_id: Optional[int] = Field(default=None, foreign_key="tldr.id")
+    tldr_id: Optional[int] = Field(foreign_key="tldr.id")
     tldr: Optional["TLDR"] = Relationship(back_populates="data")
 
 class TLDR(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    metadata_id: Optional[int] = Field(default=None, foreign_key="metadata.id")
-    metadata: Optional[Metadata] = Relationship()
+    metadata_id: Optional[int] = Field(foreign_key="metadata.id")
+    metadata_entry: Optional[Metadata] = Relationship()
     data: List[Data] = Relationship(back_populates="tldr", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
 Data.update_forward_refs()
