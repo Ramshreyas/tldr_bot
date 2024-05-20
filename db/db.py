@@ -6,7 +6,7 @@ import logging
 from typing import Optional
 
 # SQLAlchemy
-from sqlmodel import SQLModel, create_engine, Session, select
+from sqlmodel import SQLModel, create_engine, Session, select, selectinload
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
@@ -138,7 +138,7 @@ def add_tldr_to_database(tldr: dict, engine):
 def get_tldr(engine, date: datetime) -> Optional[dict]:
     # Ensure tables are created
     SQLModel.metadata.create_all(engine)
-    
+
     with Session(engine) as session:
         # Query the TLDR entry where the start_time matches the given date
         statement = (
