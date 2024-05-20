@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, BigInteger
 
@@ -43,3 +44,21 @@ class Update(SQLModel, table=True):
     update_id: int = Field(primary_key=True)
     message_id: Optional[int] = Field(default=None, foreign_key="message.id")
     message: Optional[Message] = Relationship()
+
+class Metadata(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    start_time: datetime = Field(index=True)
+    end_time: datetime
+
+class Data(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    title: str
+    summary: str
+    transcript: str
+
+class TLDR(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    metadata_id: int = Field(foreign_key="metadata.id")
+    metadata: Metadata = Relationship()
+    data_id: int = Field(foreign_key="data.id")
+    data: Data = Relationship()

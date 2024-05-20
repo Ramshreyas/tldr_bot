@@ -6,7 +6,7 @@ from typing import List, Optional
 # TLDR bot
 from config.config import Config
 from db.models import Message
-from db.db import get_db, get_tldr
+from db.db import get_db, get_tldr, add_tldr_to_database
 
 # SQLAlchemy & SQLModel
 from sqlalchemy.orm import joinedload
@@ -177,6 +177,9 @@ def generate_tldr_and_save(engine, start_time: datetime, end_time: datetime, gpt
         summary = summarize_chat(transcript, gpt)
         title = title_for_summary(summary, gpt)
         tldr["data"].append({"title": title, "summary": summary, "transcript": transcript})
+
+    # Add the TLDR to the database
+    tldr_entry = add_tldr_to_database(tldr, engine)
 
     return tldr
 
