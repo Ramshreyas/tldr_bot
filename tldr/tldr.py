@@ -199,6 +199,8 @@ def fetch_latest_tldr():
 
         # If no TLDR exists for yesterday, generate the latest TLDR
         if not tldr:
+            print("INSIDE GENERATING TLDR")
+
             tldr = generate_tldr_and_save(session.bind, start_date, end_date, gpt)
 
     return tldr
