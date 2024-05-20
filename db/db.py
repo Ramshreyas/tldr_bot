@@ -13,7 +13,7 @@ from sqlalchemy import func
 
 # TLDR Bot modules
 from config.config import Config
-from db.models import ChatType, Chat, User, Message, Update, TLDR, Metadata, Data
+from db.models import ChatType, Chat, User, Message, Update, TLDR
 
 # PostgreSQL connection URL
 DATABASE_HOST = "db"  # Service name in docker-compose.yml
