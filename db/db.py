@@ -111,43 +111,21 @@ def add_tldr_to_database(tldr: dict, engine):
     if not isinstance(metadata_info, dict) or not isinstance(data_info_list, list):
         raise ValueError("Expected dictionary for metadata and list for data information")
     
-    metadata_entry = Metadata(start_time=metadata_info['start_time'], end_time=metadata_info['end_time'])
+    tldr_entry = TLDR(
+        start_time=metadata_info['start_time'],
+        end_time=metadata_info['end_time']
+    )
+    tldr_entry.set_data(data_info_list)
     
     with Session(engine) as session:
-        # Add metadata to get its ID
-        session.add(metadata_entry)
-        session.flush()  # Generate the ID for metadata_entry without committing
-        
-        # Create and add the TLDR entry
-        tldr_entry = TLDR(metadata_id=metadata_entry.id, metadata_entry=metadata_entry)
         session.add(tldr_entry)
-        session.flush()  # Generate the ID for tldr_entry without committing
-        
-        # Add data entries
-        for data_info in data_info_list:
-            if not isinstance(data_info, dict):
-                raise ValueError("Expected dictionary for each data entry")
-            data_entry = Data(
-                title=data_info['title'],
-                summary=data_info['summary'],
-                transcript=data_info['transcript'],
-                tldr_id=tldr_entry.id,
-                tldr=tldr_entry
-            )
-            session.add(data_entry)
-        
-        # Commit all entries in one transaction
         session.commit()
         session.refresh(tldr_entry)
     
     return tldr_entry
 
 
-
 def get_tldr(engine, date: datetime) -> Optional[dict]:
-    # Ensure tables are created
-    SQLModel.metadata.create_all(engine)
-    
     with Session(engine) as session:
         # Extract the date part from the given datetime
         date_only = date.date()
@@ -155,32 +133,23 @@ def get_tldr(engine, date: datetime) -> Optional[dict]:
         # Query the TLDR entry where the start_time matches the given date
         statement = (
             select(TLDR)
-            .join(TLDR.metadata_entry)
-            .where(func.date(Metadata.start_time) == date_only)
-            .options(selectinload(TLDR.data))  # Eager load data
+            .where(func.date(TLDR.start_time) == date_only)
         )
         tldr_entry = session.exec(statement).first()
 
         if tldr_entry:
-            # Fetch associated metadata and data
-            metadata_entry = tldr_entry.metadata_entry
-            data_entries = tldr_entry.data
-
             # Construct the tldr dictionary
             tldr_dict = {
-                "metadata_entry": {
-                    "start_time": metadata_entry.start_time,
-                    "end_time": metadata_entry.end_time
+                "metadata": {
+                    "start_time": tldr_entry.start_time,
+                    "end_time": tldr_entry.end_time
                 },
-                "data": [{
-                    "title": data_entry.title,
-                    "summary": data_entry.summary,
-                    "transcript": data_entry.transcript
-                } for data_entry in data_entries]
+                "data": tldr_entry.get_data()
             }
             return tldr_dict
 
     return None
+
 
 def reconstruct_chat_as_text(engine, start_time: datetime, end_time: datetime):
     chat_history = []

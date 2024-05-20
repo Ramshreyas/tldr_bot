@@ -1,5 +1,6 @@
 from typing import Optional, List
 from datetime import datetime
+import json
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, BigInteger
 
@@ -45,23 +46,14 @@ class Update(SQLModel, table=True):
     message_id: Optional[int] = Field(default=None, foreign_key="message.id")
     message: Optional[Message] = Relationship()
 
-class Metadata(SQLModel, table=True):
+class TLDR(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     start_time: datetime = Field(index=True)
     end_time: datetime
+    data: str  # JSON string representation of the list of data objects
 
-class Data(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    title: str
-    summary: str
-    transcript: str
-    tldr_id: Optional[int] = Field(foreign_key="tldr.id")
-    tldr: Optional["TLDR"] = Relationship(back_populates="data")
+    def get_data(self) -> List[dict]:
+        return json.loads(self.data)
 
-class TLDR(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    metadata_id: Optional[int] = Field(foreign_key="metadata.id")
-    metadata_entry: Optional[Metadata] = Relationship()
-    data: List[Data] = Relationship(back_populates="tldr", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
-
-Data.update_forward_refs()
+    def set_data(self, data_list: List[dict]):
+        self.data = json.dumps(data_list)
