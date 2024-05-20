@@ -3,6 +3,7 @@ import os
 import pprint
 from datetime import datetime
 import logging
+from typing import Optional
 
 # SQLAlchemy
 from sqlmodel import SQLModel, create_engine, Session, select
