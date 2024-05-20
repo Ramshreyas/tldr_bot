@@ -128,6 +128,9 @@ def add_tldr_to_database(tldr: dict, engine):
 
 
 def get_tldr(engine, date: datetime) -> Optional[dict]:
+    # Ensure tables are created
+    SQLModel.metadata.create_all(engine)
+    
     with Session(engine) as session:
         # Query the TLDR entry where the start_time matches the given date
         statement = (
