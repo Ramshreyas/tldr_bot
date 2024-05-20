@@ -126,6 +126,9 @@ def add_tldr_to_database(tldr: dict, engine):
 
 
 def get_tldr(engine, date: datetime) -> Optional[dict]:
+    # Ensure tables are created
+    SQLModel.metadata.create_all(engine)
+    
     with Session(engine) as session:
         # Extract the date part from the given datetime
         date_only = date.date()
