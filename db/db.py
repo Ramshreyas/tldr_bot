@@ -9,6 +9,7 @@ from typing import Optional
 from sqlmodel import SQLModel, create_engine, Session, select
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker, selectinload
+from sqlalchemy import func
 
 # TLDR Bot modules
 from config.config import Config
@@ -148,23 +149,26 @@ def get_tldr(engine, date: datetime) -> Optional[dict]:
     SQLModel.metadata.create_all(engine)
     
     with Session(engine) as session:
+        # Extract the date part from the given datetime
+        date_only = date.date()
+
         # Query the TLDR entry where the start_time matches the given date
         statement = (
             select(TLDR)
-            .join(TLDR.metadata)
-            .where(Metadata.start_time == date)
+            .join(TLDR.metadata_entry)
+            .where(func.date(Metadata.start_time) == date_only)
             .options(selectinload(TLDR.data))  # Eager load data
         )
         tldr_entry = session.exec(statement).first()
 
         if tldr_entry:
             # Fetch associated metadata and data
-            metadata_entry = tldr_entry.metadata
+            metadata_entry = tldr_entry.metadata_entry
             data_entries = tldr_entry.data
 
             # Construct the tldr dictionary
             tldr_dict = {
-                "metadata": {
+                "metadata_entry": {
                     "start_time": metadata_entry.start_time,
                     "end_time": metadata_entry.end_time
                 },
