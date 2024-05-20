@@ -195,13 +195,8 @@ def fetch_latest_tldr():
         # Get the TLDR for yesterday
         tldr = get_tldr(session.bind, start_date)
 
-        print("RESULT FORM FETCH LATEST TLDR", tldr)
-        print("Check if tldr is None", tldr is None)
-
         # If no TLDR exists for yesterday, generate the latest TLDR
-        if tldr is None:
-            print("INSIDE GENERATING TLDR")
-
+        if not tldr:
             tldr = generate_tldr_and_save(session.bind, start_date, end_date, gpt)
 
     return tldr
