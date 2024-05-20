@@ -114,16 +114,14 @@ def add_tldr_to_database(tldr: dict, engine):
     metadata_entry = Metadata(start_time=metadata_info['start_time'], end_time=metadata_info['end_time'])
     
     with Session(engine) as session:
-        # Add and commit metadata to get its ID
+        # Add metadata to get its ID
         session.add(metadata_entry)
-        session.commit()
-        session.refresh(metadata_entry)
+        session.flush()  # Generate the ID for metadata_entry without committing
         
         # Create and add the TLDR entry
-        tldr_entry = TLDR(metadata_id=metadata_entry.id, metadata=metadata_entry)
+        tldr_entry = TLDR(metadata_id=metadata_entry.id, metadata_entry=metadata_entry)
         session.add(tldr_entry)
-        session.commit()
-        session.refresh(tldr_entry)
+        session.flush()  # Generate the ID for tldr_entry without committing
         
         # Add data entries
         for data_info in data_info_list:
@@ -138,10 +136,12 @@ def add_tldr_to_database(tldr: dict, engine):
             )
             session.add(data_entry)
         
+        # Commit all entries in one transaction
         session.commit()
         session.refresh(tldr_entry)
     
     return tldr_entry
+
 
 
 def get_tldr(engine, date: datetime) -> Optional[dict]:
