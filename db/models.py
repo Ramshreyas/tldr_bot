@@ -59,6 +59,6 @@ class Data(SQLModel, table=True):
 class TLDR(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     metadata_id: int = Field(foreign_key="metadata.id")
-    metadata: Metadata = Relationship()
+    metadata_entry: Metadata = Relationship()  # Renamed from 'metadata' to 'metadata_entry'
     data_id: int = Field(foreign_key="data.id")
     data: Data = Relationship()
