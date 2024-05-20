@@ -106,19 +106,19 @@ def add_tldr_to_database(tldr: dict, engine):
     metadata_info = tldr['metadata']
     data_info = tldr['data']
     
-    metadata = Metadata(start_time=metadata_info['start_time'], end_time=metadata_info['end_time'])
+    metadata_entry = Metadata(start_time=metadata_info['start_time'], end_time=metadata_info['end_time'])
     data = Data(title=data_info['title'], summary=data_info['summary'], transcript=data_info['transcript'])
     
     with Session(engine) as session:
         # Add and commit metadata and data to get their IDs
-        session.add(metadata)
+        session.add(metadata_entry)
         session.add(data)
         session.commit()
-        session.refresh(metadata)
+        session.refresh(metadata_entry)
         session.refresh(data)
         
         # Create and add the TLDR entry
-        tldr_entry = TLDR(metadata_id=metadata.id, metadata=metadata, data_id=data.id, data=data)
+        tldr_entry = TLDR(metadata_id=metadata_entry.id, metadata_entry=metadata_entry, data_id=data.id, data=data)
         session.add(tldr_entry)
         session.commit()
         session.refresh(tldr_entry)
@@ -131,7 +131,7 @@ def get_tldr(engine, date: datetime) -> Optional[dict]:
         # Query the TLDR entry where the start_time matches the given date
         statement = (
             select(TLDR)
-            .join(TLDR.metadata)
+            .join(TLDR.metadata_entry)
             .join(TLDR.data)
             .where(Metadata.start_time == date)
         )
@@ -139,14 +139,14 @@ def get_tldr(engine, date: datetime) -> Optional[dict]:
 
         if tldr_entry:
             # Fetch associated metadata and data
-            metadata = tldr_entry.metadata
+            metadata_entry = tldr_entry.metadata_entry
             data = tldr_entry.data
 
             # Construct the tldr dictionary
             tldr_dict = {
                 "metadata": {
-                    "start_time": metadata.start_time,
-                    "end_time": metadata.end_time
+                    "start_time": metadata_entry.start_time,
+                    "end_time": metadata_entry.end_time
                 },
                 "data": {
                     "title": data.title,
@@ -157,7 +157,6 @@ def get_tldr(engine, date: datetime) -> Optional[dict]:
             return tldr_dict
 
     return None
-
 
 def reconstruct_chat_as_text(engine, start_time: datetime, end_time: datetime):
     chat_history = []
