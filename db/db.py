@@ -105,24 +105,32 @@ def add_tldr_to_database(tldr: dict, engine):
     
     # Extract data from the dictionary
     metadata_info = tldr['metadata']
-    data_info = tldr['data']
+    data_info_list = tldr['data']
+    
+    if not isinstance(metadata_info, dict) or not isinstance(data_info_list, list):
+        raise ValueError("Expected dictionary for metadata and list for data information")
     
     metadata_entry = Metadata(start_time=metadata_info['start_time'], end_time=metadata_info['end_time'])
-    data = Data(title=data_info['title'], summary=data_info['summary'], transcript=data_info['transcript'])
     
     with Session(engine) as session:
-        # Add and commit metadata and data to get their IDs
+        # Add and commit metadata to get its ID
         session.add(metadata_entry)
-        session.add(data)
         session.commit()
         session.refresh(metadata_entry)
-        session.refresh(data)
         
         # Create and add the TLDR entry
-        tldr_entry = TLDR(metadata_id=metadata_entry.id, metadata_entry=metadata_entry, data_id=data.id, data=data)
+        tldr_entry = TLDR(metadata_id=metadata_entry.id, metadata_entry=metadata_entry)
         session.add(tldr_entry)
         session.commit()
         session.refresh(tldr_entry)
+        
+        # Add data entries
+        for data_info in data_info_list:
+            if not isinstance(data_info, dict):
+                raise ValueError("Expected dictionary for each data entry")
+            data_entry = Data(title=data_info['title'], summary=data_info['summary'], transcript=data_info['transcript'], tldr_id=tldr_entry.id)
+            session.add(data_entry)
+        session.commit()
     
     return tldr_entry
 
@@ -136,15 +144,15 @@ def get_tldr(engine, date: datetime) -> Optional[dict]:
         statement = (
             select(TLDR)
             .join(TLDR.metadata_entry)
-            .join(TLDR.data)
             .where(Metadata.start_time == date)
+            .options(selectinload(TLDR.data))  # Eager load data
         )
         tldr_entry = session.exec(statement).first()
 
         if tldr_entry:
             # Fetch associated metadata and data
             metadata_entry = tldr_entry.metadata_entry
-            data = tldr_entry.data
+            data_entries = tldr_entry.data
 
             # Construct the tldr dictionary
             tldr_dict = {
@@ -152,11 +160,11 @@ def get_tldr(engine, date: datetime) -> Optional[dict]:
                     "start_time": metadata_entry.start_time,
                     "end_time": metadata_entry.end_time
                 },
-                "data": {
-                    "title": data.title,
-                    "summary": data.summary,
-                    "transcript": data.transcript
-                }
+                "data": [{
+                    "title": data_entry.title,
+                    "summary": data_entry.summary,
+                    "transcript": data_entry.transcript
+                } for data_entry in data_entries]
             }
             return tldr_dict
 

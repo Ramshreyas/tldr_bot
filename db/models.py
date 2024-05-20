@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, BigInteger
@@ -55,10 +55,11 @@ class Data(SQLModel, table=True):
     title: str
     summary: str
     transcript: str
+    tldr_id: int = Field(foreign_key="tldr.id")  # Foreign key to TLDR
+    tldr_entry: "TLDR" = Relationship(back_populates="data")
 
 class TLDR(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     metadata_id: int = Field(foreign_key="metadata.id")
-    metadata_entry: Metadata = Relationship()  # Renamed from 'metadata' to 'metadata_entry'
-    data_id: int = Field(foreign_key="data.id")
-    data: Data = Relationship()
+    metadata_entry: Metadata = Relationship()
+    data: List[Data] = Relationship(back_populates="tldr_entry")
