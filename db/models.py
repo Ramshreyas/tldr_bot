@@ -63,3 +63,5 @@ class TLDR(SQLModel, table=True):
     metadata_id: int = Field(foreign_key="metadata.id")
     metadata_entry: Metadata = Relationship()
     data: List[Data] = Relationship(back_populates="tldr_entry")
+
+Data.update_forward_refs()
