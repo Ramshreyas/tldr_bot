@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 
 # TLDR Bot modules
 from config.config import Config
-from db.models import ChatType, Chat, User, Message, Update
+from db.models import ChatType, Chat, User, Message, Update, TLDR, Metadata, Data
 
 # PostgreSQL connection URL
 DATABASE_HOST = "db"  # Service name in docker-compose.yml
@@ -98,7 +98,64 @@ def add_update_to_database(update_data, engine):
         session.commit()
 
 
-def get_tldr(engine, date: datetime):
+def add_tldr_to_database(tldr: dict, engine):
+    # Ensure tables are created
+    SQLModel.metadata.create_all(engine)
+    
+    # Extract data from the dictionary
+    metadata_info = tldr['metadata']
+    data_info = tldr['data']
+    
+    metadata = Metadata(start_time=metadata_info['start_time'], end_time=metadata_info['end_time'])
+    data = Data(title=data_info['title'], summary=data_info['summary'], transcript=data_info['transcript'])
+    
+    with Session(engine) as session:
+        # Add and commit metadata and data to get their IDs
+        session.add(metadata)
+        session.add(data)
+        session.commit()
+        session.refresh(metadata)
+        session.refresh(data)
+        
+        # Create and add the TLDR entry
+        tldr_entry = TLDR(metadata_id=metadata.id, metadata=metadata, data_id=data.id, data=data)
+        session.add(tldr_entry)
+        session.commit()
+        session.refresh(tldr_entry)
+    
+    return tldr_entry
+
+
+def get_tldr(engine, date: datetime) -> Optional[dict]:
+    with Session(engine) as session:
+        # Query the TLDR entry where the start_time matches the given date
+        statement = (
+            select(TLDR)
+            .join(TLDR.metadata)
+            .join(TLDR.data)
+            .where(Metadata.start_time == date)
+        )
+        tldr_entry = session.exec(statement).first()
+
+        if tldr_entry:
+            # Fetch associated metadata and data
+            metadata = tldr_entry.metadata
+            data = tldr_entry.data
+
+            # Construct the tldr dictionary
+            tldr_dict = {
+                "metadata": {
+                    "start_time": metadata.start_time,
+                    "end_time": metadata.end_time
+                },
+                "data": {
+                    "title": data.title,
+                    "summary": data.summary,
+                    "transcript": data.transcript
+                }
+            }
+            return tldr_dict
+
     return None
 
 
