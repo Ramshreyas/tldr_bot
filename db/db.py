@@ -119,7 +119,7 @@ def add_tldr_to_database(tldr: dict, engine):
         session.refresh(metadata_entry)
         
         # Create and add the TLDR entry
-        tldr_entry = TLDR(metadata_id=metadata_entry.id, metadata_entry=metadata_entry)
+        tldr_entry = TLDR(metadata_id=metadata_entry.id, metadata=metadata_entry)
         session.add(tldr_entry)
         session.commit()
         session.refresh(tldr_entry)
@@ -128,9 +128,17 @@ def add_tldr_to_database(tldr: dict, engine):
         for data_info in data_info_list:
             if not isinstance(data_info, dict):
                 raise ValueError("Expected dictionary for each data entry")
-            data_entry = Data(title=data_info['title'], summary=data_info['summary'], transcript=data_info['transcript'], tldr_id=tldr_entry.id)
+            data_entry = Data(
+                title=data_info['title'],
+                summary=data_info['summary'],
+                transcript=data_info['transcript'],
+                tldr_id=tldr_entry.id,
+                tldr=tldr_entry
+            )
             session.add(data_entry)
+        
         session.commit()
+        session.refresh(tldr_entry)
     
     return tldr_entry
 
@@ -138,12 +146,12 @@ def add_tldr_to_database(tldr: dict, engine):
 def get_tldr(engine, date: datetime) -> Optional[dict]:
     # Ensure tables are created
     SQLModel.metadata.create_all(engine)
-
+    
     with Session(engine) as session:
         # Query the TLDR entry where the start_time matches the given date
         statement = (
             select(TLDR)
-            .join(TLDR.metadata_entry)
+            .join(TLDR.metadata)
             .where(Metadata.start_time == date)
             .options(selectinload(TLDR.data))  # Eager load data
         )
@@ -151,7 +159,7 @@ def get_tldr(engine, date: datetime) -> Optional[dict]:
 
         if tldr_entry:
             # Fetch associated metadata and data
-            metadata_entry = tldr_entry.metadata_entry
+            metadata_entry = tldr_entry.metadata
             data_entries = tldr_entry.data
 
             # Construct the tldr dictionary
