@@ -32,14 +32,8 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def ensure_database_schema(engine=engine):
-    try:
-        # Attempt to fetch data from an expected table to see if schema is in place
-        with Session(engine) as session:
-            logging.info(f"DB URL: {ENGINE_URL}")
-            session.execute(select(User)).first()
-    except:
-        # If schema doesn't exist, create it
-        SQLModel.metadata.create_all(engine)
+    # If schema doesn't exist, create it
+    SQLModel.metadata.create_all(engine)
 
 
 def get_db():
