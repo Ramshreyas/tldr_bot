@@ -44,4 +44,4 @@ def unsubscribe_user(update: Update, context: CallbackContext):
             session.commit()
             update.message.reply_text("You have successfully unsubscribed from daily TLDRs.")
         else:
-            update.message.reply_text("You are not subscribed."
+            update.message.reply_text("You are not subscribed.")
