@@ -205,7 +205,9 @@ def fetch_latest_tldr():
 # Format the tldr
 def format_tldr(tldr):
     # Format the TLDR start date into a readable string
-    formatted_tldr = f"{tldr['metadata']['start_time'].strftime('%B %d, %Y')}\n\n"
+    start_time = tldr['metadata']['start_time']
+    end_time = tldr['metadata']['end_time']
+    formatted_tldr = f"{start_time.strftime('%B %d, %Y %H')} - {end_time.strftime('%H')}\n\n"
 
     for chat in tldr["data"]:
         formatted_tldr += f"{chat['title']}:\n\n"
