@@ -132,7 +132,7 @@ def summarize_chat(chat_text, gpt):
     response = gpt.chat.completions.create(
         model="gpt-4-turbo",  # Use an appropriate model, like 'gpt-3.5-turbo'
         messages=[{"role": "system", "content": """
-Provide a detailed summary of the chat transcript below.
+Provide a detailed summary of the chat transcript below for group members who missed the chat.
 The summary should capture the key points and essence of the conversation.
 When summarizing, ensure you reference the participants by name.
 Finish with a conclusion that encapsulates the overall theme of the chat.
