@@ -126,17 +126,14 @@ def add_tldr_to_database(tldr: dict, engine):
 
 
 def get_tldr(engine, date: datetime) -> Optional[dict]:
-    # Ensure tables are created
-    SQLModel.metadata.create_all(engine)
-    
     with Session(engine) as session:
-        # Extract the date part from the given datetime
-        date_only = date.date()
+        # Extract the date and hour part from the given datetime
+        day_and_hour = date.replace(minute=0, second=0, microsecond=0)
 
-        # Query the TLDR entry where the start_time matches the given date
+        # Query the TLDR entry where the start_time matches the given day and hour
         statement = (
             select(TLDR)
-            .where(func.date(TLDR.start_time) == date_only)
+            .where(func.strftime('%Y-%m-%d %H', TLDR.start_time) == day_and_hour.strftime('%Y-%m-%d %H'))
         )
         tldr_entry = session.exec(statement).first()
 
