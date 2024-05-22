@@ -17,6 +17,7 @@ from handlers.bot_interactions import help, chat, unknown
 from handlers.archiver import archive
 from handlers.tldr import tldr
 from handlers.subscription import subscribe_user, unsubscribe_user 
+from scheduler.daily_tldr import setup_scheduler
 
 
 # Logging
@@ -49,4 +50,7 @@ if __name__ == '__main__':
     # application.add_handler(start_handler)
     # application.add_handler(unknown_handler)
     
+    # Setup the scheduler
+    setup_scheduler(application)
+
     application.run_polling()

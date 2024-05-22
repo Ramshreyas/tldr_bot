@@ -5,7 +5,7 @@ from sqlmodel import select
 from db.db import get_db, ensure_database_schema
 from db.models import Subscriber
 
-def subscribe_user(update: Update, context: CallbackContext):
+async def subscribe_user(update: Update, context: CallbackContext):
     ensure_database_schema()
     user = update.effective_user
     user_id = user.id
@@ -19,15 +19,18 @@ def subscribe_user(update: Update, context: CallbackContext):
         existing_subscriber = session.execute(statement).scalars().first()
 
         if existing_subscriber:
-            update.message.reply_text("You are already subscribed.")
+            # Reply
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="You are already subscribed.")
         else:
             # Add the user to the Subscriber table
             subscriber = Subscriber(user_id=user_id, username=username)
             session.add(subscriber)
             session.commit()
-            update.message.reply_text("You have successfully subscribed to daily TLDRs.")
 
-def unsubscribe_user(update: Update, context: CallbackContext):
+            # Reply
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="You have successfully subscribed to daily TLDRs.")
+
+async def unsubscribe_user(update: Update, context: CallbackContext):
     ensure_database_schema()
     user = update.effective_user
     user_id = user.id
@@ -43,6 +46,9 @@ def unsubscribe_user(update: Update, context: CallbackContext):
             # Remove the user from the Subscriber table
             session.delete(existing_subscriber)
             session.commit()
-            update.message.reply_text("You have successfully unsubscribed from daily TLDRs.")
+
+            # Reply
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="You have successfully unsubscribed from the daily TLDRs.")
         else:
-            update.message.reply_text("You are not subscribed.")
+            # Reply
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="You are not subscribed.")
