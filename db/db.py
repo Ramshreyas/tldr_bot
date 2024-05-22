@@ -133,7 +133,7 @@ def get_tldr(engine, date: datetime) -> Optional[dict]:
         # Query the TLDR entry where the start_time matches the given day and hour
         statement = (
             select(TLDR)
-            .where(func.strftime('%Y-%m-%d %H', TLDR.start_time) == day_and_hour.strftime('%Y-%m-%d %H'))
+            .where(func.to_char(TLDR.start_time, 'YYYY-MM-DD HH24') == day_and_hour.strftime('%Y-%m-%d %H'))
         )
         tldr_entry = session.exec(statement).first()
 
