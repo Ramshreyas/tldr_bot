@@ -134,8 +134,8 @@ def summarize_chat(chat_text, gpt):
         messages=[{"role": "system", "content": """
 Provide a detailed summary of the chat transcript below.
 The summary should capture the key points and essence of the conversation.
-When summarizing, ensure you reference the participants by name and their specific positions.
-Finish with a succinct conclusion that encapsulates the overall theme of the chat.
+When summarizing, ensure you reference the participants by name.
+Finish with a conclusion that encapsulates the overall theme of the chat.
 """},
                   {"role": "user", "content": chat_text}],
         max_tokens=4096,
