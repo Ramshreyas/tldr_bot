@@ -1,11 +1,11 @@
 from telegram import Update
 from telegram.ext import CallbackContext
-from sqlmodel import Session, select
 from sqlalchemy.orm import Session
-from db.db import get_db
-from db.models import Subscriber
+from sqlmodel import select
+from db import Subscriber, get_db, ensure_database_schema
 
 def subscribe_user(update: Update, context: CallbackContext):
+    ensure_database_schema()
     user = update.effective_user
     user_id = user.id
     username = user.username
@@ -26,8 +26,8 @@ def subscribe_user(update: Update, context: CallbackContext):
             session.commit()
             update.message.reply_text("You have successfully subscribed to daily TLDRs.")
 
-
 def unsubscribe_user(update: Update, context: CallbackContext):
+    ensure_database_schema()
     user = update.effective_user
     user_id = user.id
 
