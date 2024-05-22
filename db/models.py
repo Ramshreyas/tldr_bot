@@ -57,3 +57,8 @@ class TLDR(SQLModel, table=True):
 
     def set_data(self, data_list: List[dict]):
         self.data = json.dumps(data_list)
+
+class Subscriber(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(index=True)
+    username: str
