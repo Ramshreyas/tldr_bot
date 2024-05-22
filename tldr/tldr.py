@@ -130,7 +130,7 @@ def create_transcripts_from_conversations(conversations: List[List[Message]], en
 def summarize_chat(chat_text, gpt):
     # Using the chat-specific completion API
     response = gpt.chat.completions.create(
-        model="gpt-4o",  # Use an appropriate model, like 'gpt-3.5-turbo'
+        model="gpt-4-turbo",  # Use an appropriate model, like 'gpt-3.5-turbo'
         messages=[{"role": "system", "content": """
 Provide a detailed summary of the chat transcript below.
 The summary should capture the key points and essence of the conversation.
