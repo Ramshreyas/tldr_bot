@@ -2,7 +2,8 @@ from telegram import Update
 from telegram.ext import CallbackContext
 from sqlalchemy.orm import Session
 from sqlmodel import select
-from db import Subscriber, get_db, ensure_database_schema
+from db.db import get_db, ensure_database_schema
+from db.models import Subscriber
 
 def subscribe_user(update: Update, context: CallbackContext):
     ensure_database_schema()
