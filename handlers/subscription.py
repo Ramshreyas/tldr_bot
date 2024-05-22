@@ -9,9 +9,7 @@ def subscribe_user(update: Update, context: CallbackContext):
     user_id = user.id
     username = user.username
 
-    engine = get_db()
-
-    with Session(engine) as session:
+    with next(get_db()) as session:
         # Check if the user is already subscribed
         statement = select(Subscriber).where(Subscriber.user_id == user_id)
         existing_subscriber = session.exec(statement).first()
@@ -30,9 +28,7 @@ def unsubscribe_user(update: Update, context: CallbackContext):
     user = update.effective_user
     user_id = user.id
 
-    engine = get_db()
-
-    with Session(engine) as session:
+    with next(get_db()) as session:
         # Check if the user is subscribed
         statement = select(Subscriber).where(Subscriber.user_id == user_id)
         existing_subscriber = session.exec(statement).first()
