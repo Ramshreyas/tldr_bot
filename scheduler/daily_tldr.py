@@ -3,7 +3,7 @@ from apscheduler.triggers.cron import CronTrigger
 from telegram import Bot
 from db.db import get_db
 from db.models import Subscriber
-from handlers import fetch_latest_tldr, format_tldr
+from tldr.tldr import fetch_latest_tldr, format_tldr
 
 # Function to send TLDRs to all subscribers
 def send_daily_tldr(context):
