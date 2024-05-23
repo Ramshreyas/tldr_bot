@@ -12,19 +12,24 @@ async def send_daily_tldr(context):
     latest_tldr = fetch_latest_tldr()
     formatted_tldr = format_tldr(latest_tldr)
     
-    async with next(get_db()) as session:
-        subscribers = session.query(Subscriber).all()
-        for subscriber in subscribers:
-            try:
-                await context.bot.send_message(chat_id=subscriber.user_id, text=formatted_tldr)
-                logging.info(f"Sent TLDR to {subscriber.user_id}")
-            except Exception as e:
-                logging.error(f"Error sending message to {subscriber.user_id}: {e}")
+    try:
+        # Use synchronous context management within the async function
+        session = next(get_db())
+        with session as db_session:
+            subscribers = db_session.query(Subscriber).all()
+            for subscriber in subscribers:
+                try:
+                    await context.bot.send_message(chat_id=subscriber.user_id, text=formatted_tldr)
+                    logging.info(f"Sent TLDR to {subscriber.user_id}")
+                except Exception as e:
+                    logging.error(f"Error sending message to {subscriber.user_id}: {e}")
+    except Exception as e:
+        logging.error(f"Error in send_daily_tldr: {e}")
 
 
 # Setup the scheduler
 def setup_scheduler(application):
     scheduler = AsyncIOScheduler(timezone="UTC")
-    scheduler.add_job(send_daily_tldr, CronTrigger(hour=9, minute=35), args=[application])
+    scheduler.add_job(send_daily_tldr, CronTrigger(hour=9, minute=45), args=[application])
     scheduler.start()
     return scheduler
