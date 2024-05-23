@@ -25,6 +25,6 @@ async def send_daily_tldr(context):
 # Setup the scheduler
 def setup_scheduler(application):
     scheduler = AsyncIOScheduler(timezone="UTC")
-    scheduler.add_job(send_daily_tldr, CronTrigger(hour=9, minute=25), args=[application])
+    scheduler.add_job(send_daily_tldr, CronTrigger(hour=9, minute=28), args=[application])
     scheduler.start()
     return scheduler
